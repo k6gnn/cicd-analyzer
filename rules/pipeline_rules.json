@@ -1,0 +1,266 @@
+[
+  {
+    "id": "SEC001",
+    "name": "Hardcoded Secret",
+    "category": "Security",
+    "severity": "critical",
+    "description": "A hardcoded secret, password, or token was detected in the workflow.",
+    "fix": "Move secrets to GitHub Secrets and reference them as ${{ secrets.YOUR_SECRET_NAME }}"
+  },
+  {
+    "id": "SEC002",
+    "name": "Unpinned Action Version",
+    "category": "Security",
+    "severity": "warning",
+    "description": "An action is referenced by branch name instead of a pinned version tag or SHA.",
+    "fix": "Pin actions to a specific version tag (e.g. actions/checkout@v4) or a full commit SHA"
+  },
+  {
+    "id": "SEC003",
+    "name": "Missing Workflow Permissions",
+    "category": "Security",
+    "severity": "warning",
+    "description": "No explicit permissions block defined — defaults to write-all which is overly permissive.",
+    "fix": "Add a top-level 'permissions' block with only the minimum required permissions (e.g. contents: read)"
+  },
+  {
+    "id": "SEC004",
+    "name": "Pull Request Target Risk",
+    "category": "Security",
+    "severity": "critical",
+    "description": "Workflow triggered by pull_request_target which runs in base branch context and can expose secrets to forked PRs.",
+    "fix": "Avoid pull_request_target unless strictly necessary. Never checkout PR code and run it with elevated permissions."
+  },
+  {
+    "id": "SEC005",
+    "name": "Script Injection via GitHub Context",
+    "category": "Security",
+    "severity": "critical",
+    "description": "GitHub context values are interpolated directly into a run: step — vulnerable to script injection attacks.",
+    "fix": "Pass GitHub context values through environment variables instead of interpolating them directly into run: scripts"
+  },
+  {
+    "id": "SEC006",
+    "name": "Write Permissions on Pull Request Workflow",
+    "category": "Security",
+    "severity": "warning",
+    "description": "Workflow triggered on pull_request has write permissions, allowing a malicious PR to modify the repository.",
+    "fix": "Set permissions: contents: read for pull_request triggered workflows"
+  },
+  {
+    "id": "SEC007",
+    "name": "Third-Party Action Not SHA-Pinned",
+    "category": "Security",
+    "severity": "warning",
+    "description": "A third-party action is pinned by version tag but not by full commit SHA — vulnerable to tag mutation.",
+    "fix": "Pin third-party actions to a full commit SHA (e.g. uses: owner/action@abc1234def5678)"
+  },
+  {
+    "id": "SEC008",
+    "name": "Secrets Exposed at Job Level",
+    "category": "Security",
+    "severity": "warning",
+    "description": "Secrets are passed as environment variables at job level, making them available to all steps including potentially compromised ones.",
+    "fix": "Pass secrets only at the step level, scoped to the specific step that needs them"
+  },
+  {
+    "id": "PERF001",
+    "name": "Missing Dependency Cache",
+    "category": "Performance",
+    "severity": "warning",
+    "description": "No caching step detected for dependencies.",
+    "fix": "Add actions/cache or use setup-* actions with built-in caching (e.g. setup-python with cache: pip)"
+  },
+  {
+    "id": "PERF002",
+    "name": "No Parallel Jobs",
+    "category": "Performance",
+    "severity": "info",
+    "description": "All jobs run sequentially with no parallelism.",
+    "fix": "Split independent jobs (lint, test, build) to run in parallel by removing unnecessary 'needs' dependencies"
+  },
+  {
+    "id": "PERF003",
+    "name": "Redundant Checkout Steps",
+    "category": "Performance",
+    "severity": "info",
+    "description": "Multiple checkout steps detected in the same job.",
+    "fix": "Remove duplicate checkout steps. A single actions/checkout at the start of the job is sufficient."
+  },
+  {
+    "id": "PERF004",
+    "name": "No Matrix Strategy for Multi-Version Testing",
+    "category": "Performance",
+    "severity": "info",
+    "description": "Tests appear to run against a single version only. A matrix strategy could test multiple versions in parallel.",
+    "fix": "Use strategy.matrix to test across multiple OS, language versions, or configurations simultaneously"
+  },
+  {
+    "id": "PERF005",
+    "name": "Artifact Upload Without Compression Setting",
+    "category": "Performance",
+    "severity": "info",
+    "description": "Artifacts are uploaded without specifying compression level.",
+    "fix": "Set compression-level on actions/upload-artifact (0=fastest, 6=default, 9=smallest)"
+  },
+  {
+    "id": "PERF006",
+    "name": "No Shallow Clone",
+    "category": "Performance",
+    "severity": "info",
+    "description": "actions/checkout is used without fetch-depth: 1, fetching full git history unnecessarily.",
+    "fix": "Add fetch-depth: 1 to actions/checkout unless you need full history (e.g. for changelog generation)"
+  },
+  {
+    "id": "REL001",
+    "name": "Missing Job Timeout",
+    "category": "Reliability",
+    "severity": "critical",
+    "description": "One or more jobs have no timeout-minutes set, allowing them to run indefinitely.",
+    "fix": "Add timeout-minutes to each job (e.g. timeout-minutes: 30)"
+  },
+  {
+    "id": "REL002",
+    "name": "No Retry Logic",
+    "category": "Reliability",
+    "severity": "info",
+    "description": "No retry mechanism detected for potentially flaky steps.",
+    "fix": "Use nick-fields/retry action for known flaky operations like network calls or integration tests"
+  },
+  {
+    "id": "REL003",
+    "name": "Missing Failure Notification",
+    "category": "Reliability",
+    "severity": "info",
+    "description": "No failure notification step detected.",
+    "fix": "Add a notification step with 'if: failure()' to alert the team on pipeline failures"
+  },
+  {
+    "id": "REL004",
+    "name": "No Health Check After Deploy",
+    "category": "Reliability",
+    "severity": "warning",
+    "description": "A deploy step is present but no post-deployment health check or smoke test is detected.",
+    "fix": "Add a health check step after deployment (e.g. curl the /health endpoint, run smoke tests)"
+  },
+  {
+    "id": "REL005",
+    "name": "Continue on Error on Critical Step",
+    "category": "Reliability",
+    "severity": "warning",
+    "description": "continue-on-error: true is set on a step that appears to be critical (test, build, or deploy).",
+    "fix": "Only use continue-on-error on genuinely non-critical steps. Critical steps should fail the pipeline."
+  },
+  {
+    "id": "REL006",
+    "name": "Deploy Job Without Branch Condition",
+    "category": "Reliability",
+    "severity": "warning",
+    "description": "A deploy job has no branch or environment condition — it may deploy on every push including feature branches.",
+    "fix": "Add an 'if' condition to deploy jobs: if: github.ref == 'refs/heads/main'"
+  },
+  {
+    "id": "REL007",
+    "name": "No Rollback Mechanism",
+    "category": "Reliability",
+    "severity": "info",
+    "description": "Deployment steps detected but no rollback or recovery step is present.",
+    "fix": "Add a rollback step triggered on failure (if: failure()) after the deploy step"
+  },
+  {
+    "id": "BP001",
+    "name": "No Concurrency Control",
+    "category": "Best Practices",
+    "severity": "warning",
+    "description": "No concurrency settings defined — multiple workflow runs can execute simultaneously.",
+    "fix": "Add a concurrency block with cancel-in-progress: true to cancel stale runs on new pushes"
+  },
+  {
+    "id": "BP002",
+    "name": "Hardcoded Environment Values",
+    "category": "Best Practices",
+    "severity": "warning",
+    "description": "Environment-specific values appear hardcoded directly in the workflow.",
+    "fix": "Move environment-specific values to GitHub Variables or a top-level env block"
+  },
+  {
+    "id": "BP003",
+    "name": "Missing Workflow Name",
+    "category": "Best Practices",
+    "severity": "info",
+    "description": "The workflow has no human-readable name.",
+    "fix": "Add a 'name:' field at the top of the workflow file"
+  },
+  {
+    "id": "BP004",
+    "name": "Missing Job Names",
+    "category": "Best Practices",
+    "severity": "info",
+    "description": "One or more jobs use only the job ID with no descriptive name.",
+    "fix": "Add a 'name:' field to each job for readable pipeline visualization in GitHub UI"
+  },
+  {
+    "id": "BP005",
+    "name": "No GitHub Environment Referenced",
+    "category": "Best Practices",
+    "severity": "warning",
+    "description": "Deployment jobs do not reference a named GitHub Environment, missing protection rules and audit trail.",
+    "fix": "Add 'environment: production' to deploy jobs to enforce approval gates and environment-scoped secrets"
+  },
+  {
+    "id": "BP006",
+    "name": "Workflow Triggers on All Branches",
+    "category": "Best Practices",
+    "severity": "info",
+    "description": "Workflow triggers on push to all branches, causing unnecessary runs on every feature branch.",
+    "fix": "Restrict push trigger: on: push: branches: [main, develop]"
+  },
+  {
+    "id": "BP007",
+    "name": "Steps Without Names",
+    "category": "Best Practices",
+    "severity": "info",
+    "description": "Multiple steps have no descriptive name, making pipeline logs hard to read.",
+    "fix": "Add a 'name:' field to each step describing what it does"
+  },
+  {
+    "id": "BP008",
+    "name": "Outdated Action Version",
+    "category": "Best Practices",
+    "severity": "info",
+    "description": "One or more actions are pinned to an older major version (v1 or v2) when v4+ is available.",
+    "fix": "Update to the latest major version of commonly used actions (actions/checkout@v4, actions/setup-python@v5)"
+  },
+  {
+    "id": "MAINT001",
+    "name": "Duplicated Job Configuration",
+    "category": "Maintainability",
+    "severity": "info",
+    "description": "Multiple jobs share identical runner or environment configuration that could be extracted.",
+    "fix": "Use reusable workflows or composite actions to eliminate duplicated job configuration"
+  },
+  {
+    "id": "MAINT002",
+    "name": "Long Inline Shell Script",
+    "category": "Maintainability",
+    "severity": "info",
+    "description": "A run: step contains a long multi-line shell script that would be better as a separate file.",
+    "fix": "Extract long scripts to a file in the repository (e.g. scripts/deploy.sh) and call it from the workflow"
+  },
+  {
+    "id": "MAINT003",
+    "name": "No Workflow Comments",
+    "category": "Maintainability",
+    "severity": "info",
+    "description": "The workflow has no comments explaining its purpose or non-obvious configuration choices.",
+    "fix": "Add YAML comments (#) to explain the workflow purpose and any non-obvious decisions"
+  },
+  {
+    "id": "MAINT004",
+    "name": "Mixed Runner Types",
+    "category": "Maintainability",
+    "severity": "info",
+    "description": "Different jobs use different runner OS types without clear reason, making maintenance harder.",
+    "fix": "Standardize runner types across jobs unless cross-platform testing is intentional"
+  }
+]
