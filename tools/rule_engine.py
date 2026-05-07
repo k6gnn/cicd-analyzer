@@ -325,10 +325,9 @@ def evaluate(parsed_workflow: dict) -> list[dict]:
 
 
 def calculate_score(findings: list[dict]) -> int:
-    """Calculate a 0-100 health score. Criticals are heavily penalized."""
-    deductions = {"critical": 20, "warning": 7, "info": 2}
-    total = sum(deductions.get(f["severity"], 0) for f in findings)
-    return max(0, 100 - total)
+    """Calculate overall score as the average of all category scores."""
+    category_scores = get_category_scores(findings)
+    return round(sum(category_scores.values()) / len(category_scores))
 
 
 def get_category_scores(findings: list[dict]) -> dict:
